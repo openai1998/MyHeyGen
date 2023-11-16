@@ -1,7 +1,5 @@
 from TTS.api import TTS
 from core.temp_manager import TempFileManager
-
-import os
 import torch
 import torchaudio
 from TTS.tts.configs.xtts_config import XttsConfig

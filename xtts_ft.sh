@@ -1,4 +1,4 @@
-python xtts_ft.py luoxiang /root/autodl-tmp/xtts_ft/luoxiang/speaker.WAV /root/autodl-tmp/xtts_ft 3 0
+python xtts_ft.py luoxiang /root/autodl-tmp/xtts_ft/luoxiang/speaker.WAV /root/autodl-tmp/xtts_ft 3 1
 
 # luoxiang 说话人编号
 # /root/autodl-tmp/xtts_ft/luoxiang/speaker.WAV 语料路径，支持.wav,.mp4文件，建议时长30min以上，音质佳，杂音少
