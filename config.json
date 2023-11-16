@@ -2,10 +2,11 @@
     "DET_TRESH": 0.3,
     "DIST_TRESH": 0.2,
     "DB_NAME": "storage.db",
-    "HF_TOKEN": "",
-    "TS_APPID": "",
-    "TS_APPKEY": "",
-    "HUMAN_TRANS": 0,
+    "HF_TOKEN": "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",
+    "TS_APPID": "20230601001696882",
+    "TS_APPKEY": "YGyjyDtvNInreHE9RjLD",
+    "HUMAN_TRANS": 1,
     "SPEAKER_NUM": 1,
-    "TTS_MODEL":"tts_models/multilingual/multi-dataset/xtts_v2"
+    "TTS_MODEL":"tts_models/multilingual/multi-dataset/xtts_v2",
+    "FT_TTS_MODEL": "/root/autodl-tmp/xtts_ft/finetuning/luoxiang_GPT_XTTS_v2.0_LJSpeech_FT"
 }

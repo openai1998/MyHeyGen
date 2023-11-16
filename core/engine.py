@@ -39,7 +39,7 @@ class Engine:
         self.device = torch.device(device_type)
         self.whisper_batch_size = 16
         self.whisper = load_model('large-v2', device=device_type, compute_type='int8')
-        self.diarize_model = DiarizationPipeline(use_auth_token=config['HF_TOKEN'])
+        self.diarize_model = DiarizationPipeline(use_auth_token=config['HF_TOKEN'],device=device_type)
         self.text_helper = TextHelper(config)
         self.temp_manager = TempFileManager()
         self.speaker_num = config["SPEAKER_NUM"]
@@ -203,9 +203,9 @@ class Engine:
 
             combined_audio = combine_audio(speech_audio_wav, noise_audio_wav)
 
-            command = 'pip install librosa==0.9.2 && cd ./video-retalking && rm -rf ./temp/* && python inference.py \
+            command = 'pip install librosa==0.9.2 && cp {} {}/audio.wav && cd ./video-retalking && rm -rf ./temp/* && python inference.py \
             --face {} --audio {} --outfile {} --LNet_batch_size {}'.format(
-                video_file_path, combined_audio, output_file_path, 2
+                combined_audio, Path(output_file_path).parent, video_file_path, combined_audio, output_file_path, 8
             )
             subprocess.call(command, shell=True)
         
@@ -216,11 +216,11 @@ class Engine:
         self.dereverb = None
         torch.cuda.empty_cache()
         print("cuda memeroy:{}".format(torch.cuda.memory_reserved()))
-        print("You may need CTRL+C here!")
+        
         
     def transcribe_audio_extended(self, audio_file):
         audio = load_audio(audio_file)
-        result = self.whisper.transcribe(audio, batch_size=self.whisper_batch_size)
+        result = self.whisper.transcribe(audio, batch_size=self.whisper_batch_size,chunk_size=15)
         language = result['language']
         model_a, metadata = load_align_model(language_code=language, device=self.device)
         result = align(result['segments'], model_a, metadata, audio, self.device, return_char_alignments=False)
