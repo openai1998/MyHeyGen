@@ -47,7 +47,7 @@ pip install TTS=0.20.2
 pip install tensorflow=2.13.0
 pip install numpy=1.22.2
 ```
-群友“山山而川”反馈已跑通
+群友[weiraneve](https://github.com/weiraneve)反馈已跑通
       
 3.或者拉取docker镜像
 ```

@@ -27,29 +27,32 @@ class TextHelper:
         self.appid = config["TS_APPID"]
         self.appkey = config['TS_APPKEY']
         self.human_trans = config["HUMAN_TRANS"]
-        
+    
+    def lang_code_map(self,lang_code):
+        lang_dict = {
+            'en': "en",
+            'es': "spa", 
+            'fr': "fra", 
+            'de': "de", 
+            'it': "it",
+            'pt': "pt", 
+            'pl': "pl", 
+            'tr': "tr", 
+            'ru': "ru", 
+            'nl': "nl", 
+            'cs': "cs", 
+            'ar': "ara", 
+            'zh-cn': "zh", 
+            'ja': "jp",
+            'hu': "hu",
+            'ko': "kor"
+        }
+        return lang_dict[lang_code]
     def translate(self, text, src_lang, dst_lang):
         # For list of language codes, please refer to `https://api.fanyi.baidu.com/doc/21`
-        if 'zh' in dst_lang:
-            dst_lang = 'zh'
-        if 'zh' in src_lang:
-            src_lang = 'zh'
+        src_lang = self.lang_code_map(src_lang)
+        dst_lang = self.lang_code_map(dst_lang)
         
-        if "ja" in dst_lang:
-            dst_lang = "jp"
-        if  "ja" in src_lang:
-            src_lang = "jp"
-        
-        if "fr" in dst_lang:
-            dst_lang = "fra"
-        if  "fr" in src_lang:
-            src_lang = "fra"
-        
-        if "ko" in dst_lang:
-            dst_lang = "kor"
-        if  "ko" in src_lang:
-            src_lang = "kor"
-            
         print(text, ' ', src_lang, ' ', dst_lang)
         endpoint = 'http://api.fanyi.baidu.com'
         path = '/api/trans/vip/translate'
