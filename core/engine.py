@@ -241,7 +241,7 @@ class Engine:
         ratio = audio_duration / video_duration
         print("audio_duration / video_duration=ratio:{}".format(ratio))
         
-        new_video = video.fl_time(lambda t:  ratio*t,apply_to=['mask', 'audio'], keep_duration=True)
-        # new_video1 = new_video.set_duration(audio_duration)
-        # new_video2 = new_video1.set_fps(new_video1.fps / audio_duration * video_duration)
-        return new_video
+        new_video = video.fl_time(lambda t:  ratio*t,apply_to=['mask', 'audio'])
+        new_video1 = new_video.set_duration(audio_duration)
+        new_video2 = new_video1.set_fps(new_video1.fps / audio_duration * video_duration)
+        return new_video2
