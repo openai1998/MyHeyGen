@@ -53,7 +53,7 @@ python translate.py src_video_path lang_code -o out_video_opath
 - 2023.11.8 update TTS for more reality
 - 2023.11.9 fix video-retalking oface error
 - 2023.11.10 fix librosa version conflict with latest TTS
-- 2023.11.19 add codeformer,h5 vocal split,rewrite audio aligment
+- 2023.11.19 Huge update !!! add codeformer,h5 vocal split,rewrite audio aligment,voice-only mode
 
 ## WeChat Group and Sponsor 
 <div>

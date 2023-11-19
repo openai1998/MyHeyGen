@@ -69,7 +69,7 @@ python translate.py 原视频文件路径 想要翻译成的语言代码 -o 翻�
 - 2023.11.9 fix video-retalking oface error
 - 2023.11.10 fix librosa version conflict with latest TTS
 - 2023.11.16 add finetune for voice cloning(test on GPU A5000 24GB)
-- 2023.11.19 add codeformer,h5 vocal split,rewrite audio aligment
+- 2023.11.19 Huge update !!! add codeformer,h5 vocal split,rewrite audio aligment,voice-only mode
 
 ## 交流群及打赏码
 <div>
