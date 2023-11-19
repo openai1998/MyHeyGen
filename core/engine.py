@@ -1,6 +1,8 @@
 import re
+import time
 from core.voice_cloner import VoiceCloner
 from core.dereverb import MDXNetDereverb
+from core.audio_pre import AudioPre
 from core.scene_preprocessor import ScenePreprocessor
 from core.face.lipsync import LipSync
 from core.helpers import (
@@ -13,7 +15,7 @@ from core.helpers import (
     get_voice_segments
 )
 from core.translator import TextHelper
-from core.audio import speedup_audio, combine_audio
+from core.audio import speedup_audio, combine_audio,speed_change
 from core.temp_manager import TempFileManager
 from pydub import AudioSegment
 from core.whisperx.asr import load_model, load_audio
@@ -26,7 +28,9 @@ import numpy as np
 import subprocess
 from pathlib import Path
 from tqdm import tqdm
-from moviepy.video.io.VideoFileClip import VideoFileClip
+# from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.editor import *
+import soundfile as sf
 
 class Engine:
     def __init__(self, config, output_language):
@@ -42,80 +46,56 @@ class Engine:
         self.diarize_model = DiarizationPipeline(use_auth_token=config['HF_TOKEN'],device=device_type)
         self.text_helper = TextHelper(config)
         self.temp_manager = TempFileManager()
-        self.speaker_num = config["SPEAKER_NUM"]
         
-        if self.speaker_num > 1: 
-            self.scene_processor = ScenePreprocessor(config)
-            self.lip_sync = LipSync()
-            print("You can change SPEAKER_NUM as 1 in config.json to disable scene_processor")
+        if config["AUDIO_H5"] == 0:
+            self.audio_pre = MDXNetDereverb(15)
         else:
-            print("default speaker num is 1, you can change SPEAKER_NUM in config.json to enable scene_processor")
-        
-        self.dereverb = MDXNetDereverb(15)
+            print("enable H5 for splitting vocal and bgm")
+            self.audio_pre = AudioPre(10)
     
-    def __call__(self, video_file_path, output_file_path):
+    def __call__(self, input_file_path, output_file_path):
         # [Step 1] Reading the video, getting audio (voice + noise), as well as the text of the voice -------
         print("[Step 1] Reading the video, getting audio (voice + noise), as well as the text of the voice")
-        orig_clip = VideoFileClip(video_file_path, verbose=True)
         original_audio_file = self.temp_manager.create_temp_file(suffix='.wav').name
-        orig_clip.audio.write_audiofile(original_audio_file, codec='pcm_s16le', verbose=True, logger=None)
-
-        dereverb_out = self.dereverb.split(original_audio_file)
-        voice_audio = AudioSegment.from_file(dereverb_out['voice_file'], format='wav')
-        noise_audio = AudioSegment.from_file(dereverb_out['noise_file'], format='wav')
-
-        speakers, lang = self.transcribe_audio_extended(dereverb_out['voice_file'])
-        # ---------------------------------------------------------------------------------------------------
-        
-        if self.speaker_num > 1: 
-            # [Step 2] Getting voice segments, frames, do face detection + reidentification ---------------------
-
-            print("[Step 2] Getting voice segments, frames, do face detection + reidentification")
-            voice_segments = get_voice_segments(speakers)
-            self.scene_processor(orig_clip, video_file_path, voice_segments)
-            # ---------------------------------------------------------------------------------------------------
-
-            # [Step 3] Trying to connect the voices and the detected people -------------------------------------
-            print("[Step 3] Trying to connect the voices and the detected people")
-            speaker_groups = groupby(speakers, key=lambda x: x['speaker'])
-            connections = dict()
-
-            for speaker_name, group in speaker_groups:
-                connections[speaker_name] = []
-                for speech_element in group:
-                    speech_start_frame = int(speech_element['start'] * orig_clip.fps)
-                    speech_end_frame = int(speech_element['end'] * orig_clip.fps)
-
-                    for speech_frame_id in range(speech_start_frame, speech_end_frame + 1):
-                        person_ids = self.scene_processor.get_persons_on_frame(speech_frame_id)
-                        for person_id in person_ids:
-                            connections[speaker_name].append(person_id)
-
-            for speaker_name, groups in connections.items():
-                speaker_id = find_speaker(groups)
-                for speaker in speakers:
-                    if speaker['speaker'] == speaker_name:
-                        speaker['id'] = speaker_id
-            # ---------------------------------------------------------------------------------------------------
+        if "mp4" in input_file_path:
+            orig_clip = VideoFileClip(input_file_path, verbose=True)
+            orig_clip.audio.write_audiofile(original_audio_file, codec='pcm_s16le', verbose=True, logger=None)
         else:
-            print("When speaker num is 1, step 2,3 skipped!!!")
+            orig_clip = None
+            print("detect static picture input, find aduio file in same file path")
+            original_audio_file = input_file_path
+            
+        original_audio = AudioSegment.from_file(original_audio_file)
+        audio_res = self.audio_pre.split(original_audio_file)
+        voice_audio = AudioSegment.from_file(audio_res['voice_file'], format='wav')
+        noise_audio = AudioSegment.from_file(audio_res['noise_file'], format='wav')
 
-        # [Step 4] Merging voices, translating speech, cloning voices ---------------------------------------
-        print("[Step 4] Merging voices, translating speech, cloning voices")
+        speakers, lang = self.transcribe_audio_extended(audio_res['voice_file'])
+        # ---------------------------------------------------------------------------------------------------
+
+        # [Step 2] Merging voices, translating speech, cloning voices ---------------------------------------
+        print("[Step 2] Merging voices, translating speech, cloning voices")
         merged_voices = merge_voices(speakers, voice_audio)
 
         updates = []
         zimu_path = Path(output_file_path).parent.joinpath('zimu.txt')
-        bgm_path = Path(output_file_path).parent.joinpath('bgm.wav')
-        noise_audio.export(bgm_path,format='wav')
-        
         self.empty_cache()
         cloner = VoiceCloner(self.config,self.output_language)
-        for speaker in speakers:
+        
+        total_change_duration = 0
+        
+        speech_video = []
+        speech_audio = AudioSegment.silent(duration=0)
+        new_noise_audio = AudioSegment.silent(duration=0) 
+        prev_end = 0
+        for i, speaker in enumerate(speakers):
+            start = speaker['start'] * 1000
+            end = speaker['end'] * 1000
+            org_duration = end - start
             if 'id' in speaker:
                 voice = merged_voices[speaker['id']]
             else:
-                voice = voice_audio[speaker['start'] * 1000: speaker['end'] * 1000]
+                voice = voice_audio[start: end]
             
             voice_wav = self.temp_manager.create_temp_file(suffix='.wav').name
             voice.export(voice_wav, format='wav')
@@ -134,86 +114,110 @@ class Engine:
                 speaker_wav_filename=[voice_wav,voice_audio_wav],
                 text=dst_text
             )
-
-            sub_voice = voice_audio[speaker['start'] * 1000: speaker['end'] * 1000]
-            sub_voice_wav = self.temp_manager.create_temp_file(suffix='.wav').name
-            sub_voice.export(sub_voice_wav, format='wav')
-
-            output_wav = speedup_audio(cloned_wav, sub_voice_wav)
-
-            updates.append({
-                # In ms
-                'start': speaker['start'] * 1000,
-                'end': speaker['end'] * 1000,
-                'voice': output_wav
-            })
+            
+            if start > prev_end:
+                ## add empty video and audio
+                '''
+                if orig_clip is not None:
+                    speech_video.append(orig_clip.subclip(prev_end / 1000, start / 1000))
+                '''
+                speech_audio += AudioSegment.silent(duration=start - prev_end)
+                new_noise_audio += noise_audio[prev_end:start]
+            
+            '''
+            if orig_clip is not None:
+                tmp_video = orig_clip.subclip(start/1000, end/1000)
+            '''
+            tmp_audio = AudioSegment.from_file(cloned_wav)
+            tmp_noise_audio = noise_audio[start:end]
+            
+            tmp_noise_audio_path = self.temp_manager.create_temp_file(suffix='.wav').name
+            tmp_noise_audio.export(tmp_noise_audio_path, format='wav')
+            
+            speech_audio += tmp_audio
+            
+            '''
+            if orig_clip is not None:
+                tmp_video_ = self.video_map_audio(tmp_audio, tmp_video)
+                speech_video.append(tmp_video_)
+            '''
+            
+            tmp_noise_audio_path_ = self.temp_manager.create_temp_file(suffix='.wav').name
+            audio_noise_ratio = tmp_audio.duration_seconds / tmp_noise_audio.duration_seconds
+            y,sr = sf.read(tmp_noise_audio_path)
+            sf.write(tmp_noise_audio_path_,y,int(sr*audio_noise_ratio))
+            new_noise_audio += AudioSegment.from_file(tmp_noise_audio_path_)
+        
+            if i + 1 == len(speakers):
+                '''
+                if orig_clip is not None:
+                    speech_video.append(orig_clip.subclip(end/1000))
+                '''
+                speech_audio += voice_audio[end:]
+                new_noise_audio += noise_audio[end:]
+            prev_end = end
         # ---------------------------------------------------------------------------------------------------
         cloner = None
         torch.cuda.empty_cache()
-        # [Step 5] Creating final speech audio --------------------------------------------------------------
-        print("[Step 5] Creating final speech audio")
-        original_audio_duration = voice_audio.duration_seconds * 1000
-        
-        segments = to_segments(updates, original_audio_duration)
-
-        speech_audio = AudioSegment.silent(duration=0)
-        for segment in segments:
-            if segment['empty']:
-                duration = segment['end'] - segment['start']
-                speech_audio += AudioSegment.silent(duration=duration)
-            else:
-                speech_audio += AudioSegment.from_file(segment['voice'])
+        # [Step 3] Creating final speech audio --------------------------------------------------------------
+        print("[Step 3] Creating final speech audio and video")
         
         speech_audio_wav = self.temp_manager.create_temp_file(suffix='.wav').name
         speech_audio.export(speech_audio_wav, format='wav')
-        # ---------------------------------------------------------------------------------------------------
-        if self.speaker_num > 1: 
-            # [Step 6] LipSync + merging frames -----------------------------------------------------------------
-            print("[Step 6] LipSync + merging frames ")
-            frames = dict()
-
-            all_frames = self.scene_processor.get_frames()
-            for frame_id, frame in all_frames.items():
-                if not frame_id in frames:
-                    frames[frame_id] = {
-                        'frame': np.array(frame)
-                    }
-
-            frames = to_extended_frames(frames, speakers, orig_clip.fps, self.scene_processor.get_face_on_frame)
-            self.scene_processor.close()
-            frames = self.lip_sync.sync(frames, speech_audio_wav, orig_clip.fps)
-            # ---------------------------------------------------------------------------------------------------
-
-            # [Step 7] Merging speech voice and noise, creating output ------------------------------------------
-            print("[Step 7] Merging speech voice and noise, creating output")
-            temp_result_avi = to_avi(frames, orig_clip.fps)
-
-            noise_audio_wav = self.temp_manager.create_temp_file(suffix='.wav').name
-            noise_audio.export(noise_audio_wav, format='wav')
-
-            combined_audio = combine_audio(speech_audio_wav, noise_audio_wav)
-
-            merge(combined_audio, temp_result_avi, output_file_path)
-        # ---------------------------------------------------------------------------------------------------
-        else:
-            # [Step 6] Using video-retalking merge speech voice and video, creating output ------------------------------------------
-            print("Video-retalking merge speech voice and video, creating output!!!")
-            noise_audio_wav = self.temp_manager.create_temp_file(suffix='.wav').name
-            noise_audio.export(noise_audio_wav, format='wav')
-
-            combined_audio = combine_audio(speech_audio_wav, noise_audio_wav)
-
-            command = 'pip install librosa==0.9.2 && cp {} {}/audio.wav && cd ./video-retalking && rm -rf ./temp/* && python inference.py \
-            --face {} --audio {} --outfile {} --LNet_batch_size {}'.format(
-                combined_audio, Path(output_file_path).parent, video_file_path, combined_audio, output_file_path, 8
-            )
-            subprocess.call(command, shell=True)
         
+        noise_audio_wav = self.temp_manager.create_temp_file(suffix='.wav').name
+        new_noise_audio.export(noise_audio_wav, format='wav')
+        combined_audio = combine_audio(speech_audio_wav, noise_audio_wav)
+        
+        if orig_clip is not None:
+            '''
+            new_video_clip = concatenate_videoclips(speech_video)
+            new_video_mp4 = self.temp_manager.create_temp_file(suffix='.mp4').name
+            new_video_clip.write_videofile(new_video_mp4,audio=False,fps=60)
+            '''
+            new_video_mp4 = os.path.join(Path(output_file_path).parent, "video_extend.mp4")
+            new_video_clip = self.video_map_audio(speech_audio, orig_clip)
+            new_video_clip.write_videofile(new_video_mp4,audio=False)
+            # some bug made write twice!!
+            new_video_clip.write_videofile(new_video_mp4,audio=False)
+            input_file_path = new_video_mp4
+            
+           
+        
+        subprocess.call("cp {} {}/voice_cloned.wav".format(
+            combined_audio,Path(output_file_path).parent
+        ), shell=True)
+        
+        bgm_path = Path(output_file_path).parent.joinpath('bgm.wav')
+        new_noise_audio.export(bgm_path,format='wav')
+        
+        
+        if self.config['VOICE_ONLY'] == 1:
+            print("VOICE_ONLY all done")
+            return
+        # ---------------------------------------------------------------------------------------------------
+        
+        # [Step 4] Using video-retalking merge speech voice and video, creating output ------------------------------------
+        print("Video-retalking merge speech voice and video, creating output!!!")
+        command = 'pip install librosa==0.9.2 &&  cd ./video-retalking && rm -rf ./temp/* && python inference.py \
+        --face {} --audio {} --outfile {} --LNet_batch_size {}'.format(
+            input_file_path, combined_audio, output_file_path, 8
+        )
+        subprocess.call(command, shell=True)
+        
+        # [Step 5] Using CodeFormer upscale video, creating output ------------------------------------
+        print("Using CodeFormer upscale video, creating output!!!")
+        up_output_file_path = Path(output_file_path).parent.joinpath('out_upscale')
+        command = 'cd ./CodeFormer && python inference_codeformer.py -i {} -o {} \
+        --bg_upsampler realesrgan --face_upsample -w 0.9 -s 1'.format(
+            output_file_path, up_output_file_path
+        )
+        subprocess.call(command, shell=True)
     
     def empty_cache(self):
         self.whisper = None
         self.diarize_model = None
-        self.dereverb = None
+        self.audio_pre = None
         torch.cuda.empty_cache()
         print("cuda memeroy:{}".format(torch.cuda.memory_reserved()))
         
@@ -228,3 +232,16 @@ class Engine:
         diarize_segments = self.diarize_model(audio)
         result = assign_word_speakers(diarize_segments, result)
         return result['segments'], language
+    
+    def video_map_audio(self,audio, video):
+        audio_duration = audio.duration_seconds
+        
+        video_duration = video.duration
+        
+        ratio = audio_duration / video_duration
+        print("audio_duration / video_duration=ratio:{}".format(ratio))
+        
+        new_video = video.fl_time(lambda t:  ratio*t,apply_to=['mask', 'audio'], keep_duration=True)
+        # new_video1 = new_video.set_duration(audio_duration)
+        # new_video2 = new_video1.set_fps(new_video1.fps / audio_duration * video_duration)
+        return new_video

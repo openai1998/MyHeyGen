@@ -18,6 +18,7 @@ from core.helpers import (
 )
 from moviepy.video.io.VideoFileClip import VideoFileClip
 from core.dereverb import MDXNetDereverb
+from core.audio_pre import AudioPre
 from pydub import AudioSegment
 
 from core.whisperx.asr import load_model, load_audio
@@ -60,7 +61,7 @@ def transcribe_audio_extended(audio_file):
     return result['segments'], language
 
 
-def gen_ft_dataset(original_audio_file):
+def gen_ft_dataset(original_audio_file, is_audio_h5 = True):
     ft_dataset_path = Path(original_audio_file).parent.joinpath("ft_dataset")
     subprocess.call("rm -rf {}".format(ft_dataset_path), shell=True)
     Path.mkdir(ft_dataset_path,parents=True, exist_ok=True)
@@ -69,10 +70,15 @@ def gen_ft_dataset(original_audio_file):
     csv_path = ft_dataset_path.joinpath("metadata.csv")
     
     ## remove noise
-    dereverb = MDXNetDereverb(15)
-    dereverb_out = dereverb.split(original_audio_file)
-    voice_audio = AudioSegment.from_file(dereverb_out['voice_file'], format='wav')
-    speakers, lang = transcribe_audio_extended(dereverb_out['voice_file'])
+    if is_audio_h5:
+        print("enable H5 for splitting vocal and bgm")
+        audio_pre = AudioPre(10)
+    else:
+        audio_pre = MDXNetDereverb(15)
+        
+    audio_pre_out = audio_pre.split(original_audio_file)
+    voice_audio = AudioSegment.from_file(audio_pre_out['voice_file'], format='wav')
+    speakers, lang = transcribe_audio_extended(audio_pre_out['voice_file'])
     
     merged_voices = merge_voices(speakers, voice_audio)
     
@@ -112,7 +118,7 @@ def gen_ft_dataset(original_audio_file):
     
     return os.path.join(ft_dataset_path), lang
 
-def finetune_xtts(speaker_name,speaker_filename,finetune_workpalce,batch_size, is_gen_dataset):
+def finetune_xtts(speaker_name,speaker_filename,finetune_workpalce,batch_size, is_gen_dataset=1,is_audio_h5=True):
     print("[Step 1] split audio and generate xtts format datasets")
     original_audio_file = Path(speaker_filename).parent.joinpath("audio_from_video.wav")
     if is_gen_dataset == 1:
@@ -309,14 +315,16 @@ if __name__ == "__main__":
     parser.add_argument('speaker_name', help="name your custom speaker")
     parser.add_argument('speaker_filename', help="the abslute path to speaker file which contant the speaker's quality voice, can be .mp4 or .wav")
     parser.add_argument('finetune_workpalce', help='the abslute path to save model finetuned, available cache bigger is better')
-    parser.add_argument('batch_size', default=3, help='custom the finetuing batch_size')
-    parser.add_argument('is_gen_dataset', default=1, help='the abslute path to save model finetuned, available cache bigger is better')
+    parser.add_argument('batch_size',type=int,default=3, help='custom the finetuing batch_size')
+    parser.add_argument('is_gen_dataset', type=int,default=1, help='the abslute path to save model finetuned, available cache bigger is better')
+    parser.add_argument('--is_audio_h5',type=bool,default=True, help='')
     args = parser.parse_args()
     
     finetune_xtts(
         speaker_name = args.speaker_name,
         speaker_filename=args.speaker_filename,
         finetune_workpalce=args.finetune_workpalce,
-        batch_size=int(args.batch_size),
-        is_gen_dataset = int(args.is_gen_dataset)
+        batch_size=args.batch_size,
+        is_gen_dataset = args.is_gen_dataset,
+        is_audio_h5 = args.is_audio_h5
         )

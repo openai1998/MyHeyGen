@@ -120,6 +120,8 @@ def speedup_audio(src_audio_filename, dst_audio_filename):
 
     # Fitting to dst
     ratio = dst_duration / src_duration
+    print(src_duration)
+    print(dst_duration)
 
     temp_manager = TempFileManager()
     temp_file = temp_manager.create_temp_file(suffix='.wav').name

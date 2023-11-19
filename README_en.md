@@ -53,6 +53,7 @@ python translate.py src_video_path lang_code -o out_video_opath
 - 2023.11.8 update TTS for more reality
 - 2023.11.9 fix video-retalking oface error
 - 2023.11.10 fix librosa version conflict with latest TTS
+- 2023.11.19 add codeformer,h5 vocal split,rewrite audio aligment
 
 ## WeChat Group and Sponsor 
 <div>
@@ -75,7 +76,9 @@ python translate.py src_video_path lang_code -o out_video_opath
     "HUMAN_TRANS": 0, ## 1 human check; 0 auto
     "SPEAKER_NUM": 1, 
     "TTS_MODEL":"tts_models/multilingual/multi-dataset/xtts_v2",
-    "FT_TTS_MODEL": "" ##the finetune model path to enable xtts fineting mode
+    "FT_TTS_MODEL": "" ##the finetune model path to enable xtts fineting mode,
+    "AUDIO_H5": 0,  ## 1 enable H5 for vocal split 0 disable
+    "VOICE_ONLY": 0 ## 1 enable voice_only mode 0 disable
 }
 ```
 ## About  Finetune

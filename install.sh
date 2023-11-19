@@ -30,3 +30,6 @@ pip install dlib --verbose
 
 apt update
 apt install ffmpeg
+
+## codeformer
+bash ./CodeFormer/codeformer_install.sh

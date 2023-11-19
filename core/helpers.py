@@ -121,11 +121,12 @@ def to_segments(updates, audio_duration):
         start = update['start']
         end = update['end']
         voice = update['voice']
+        video = update['video']
 
         if start > prev_end:
             segments.append({'start': prev_end, 'end': start, 'empty': True})
         
-        segments.append({'start': start, 'end': end, 'empty': False, 'voice': voice })
+        segments.append({'start': start, 'end': end, 'empty': False, 'voice': voice , 'video': video})
 
         if i + 1 == len(updates) and end < audio_duration:
             segments.append({'start': end, 'end': audio_duration, 'empty': True})

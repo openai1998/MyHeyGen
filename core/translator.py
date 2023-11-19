@@ -43,6 +43,7 @@ class TextHelper:
             'cs': "cs", 
             'ar': "ara", 
             'zh-cn': "zh", 
+            'zh':"zh",
             'ja': "jp",
             'hu': "hu",
             'ko': "kor"

@@ -17,7 +17,7 @@
 相当于一键包，不需要配环境，但是得微氪金
 
 ## 环境准备
-1. 在[huggingface申请token](https://huggingface.co/),放在config.json的HF_TOKEN参数下
+1. 在[huggingface申请token](https://huggingface.co/),放在config.json的HF_TOKEN参数下,分别同意[`speaker-diarization`](https://hf.co/pyannote/speaker-diarization)和[`segmentation`](https://hf.co/pyannote/segmentation)的使用协议
 2. 在[百度翻译申请APPKey](https://fanyi-api.baidu.com/doc/21)用于翻译字幕放在config.json的TS_APPID和TS_APPKEY参数下
 3. 下载`weights` [drive](https://drive.google.com/file/d/1dYy24q_67TmVuv_PbChe2t1zpNYJci1J/view?usp=sharing)放在MyHeyGen目录下，下载`checkpoints` [drive](https://drive.google.com/drive/folders/18rhjMpxK8LVVxf7PI6XwOidt8Vouv_H0?usp=share_link) 放在video-retalking目录下,从weights复制GFPGANv1.4.pth到checkpoints，如下图
 
@@ -69,6 +69,7 @@ python translate.py 原视频文件路径 想要翻译成的语言代码 -o 翻�
 - 2023.11.9 fix video-retalking oface error
 - 2023.11.10 fix librosa version conflict with latest TTS
 - 2023.11.16 add finetune for voice cloning(test on GPU A5000 24GB)
+- 2023.11.19 add codeformer,h5 vocal split,rewrite audio aligment
 
 ## 交流群及打赏码
 <div>
@@ -91,6 +92,8 @@ python translate.py 原视频文件路径 想要翻译成的语言代码 -o 翻�
     "SPEAKER_NUM": 1, ## 涉及多人多场景使用，>1的数字
     "TTS_MODEL":"tts_models/multilingual/multi-dataset/xtts_v2",
     "FT_TTS_MODEL": "" ##填入finetune模型所在文件夹的绝对路径则开启TTS的finetune模式
+    "AUDIO_H5": 0,  ## 1 使用H5做人声分离算法 0 不使用
+    "VOICE_ONLY": 0 ## 1 只处理音频文件 0 不开启
 }
 ```
 ## 关于Finetune

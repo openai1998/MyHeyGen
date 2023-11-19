@@ -117,6 +117,9 @@ class Croper:
     
     def crop(self, img_np_list, xsize=512):    # first frame for all video
         idx = 0
+        if len(img_np_list) == 1:
+            img_np = img_np_list[0]
+            lm = self.get_landmark(img_np)
         while idx < len(img_np_list)//2 :   # TODO 
             img_np = img_np_list[idx]
             lm = self.get_landmark(img_np)
