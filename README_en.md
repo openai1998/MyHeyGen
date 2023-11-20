@@ -74,7 +74,6 @@ python translate.py src_video_path lang_code -o out_video_opath
     "TS_APPID": "",  ## Baidu Fanyi 
     "TS_APPKEY": "", ## Baidu Fanyi 
     "HUMAN_TRANS": 0, ## 1 human check; 0 auto
-    "SPEAKER_NUM": 1, 
     "TTS_MODEL":"tts_models/multilingual/multi-dataset/xtts_v2",
     "FT_TTS_MODEL": "" ##the finetune model path to enable xtts fineting mode,
     "AUDIO_H5": 0,  ## 1 enable H5 for vocal split 0 disable

@@ -57,12 +57,13 @@ class Engine:
         # [Step 1] Reading the video, getting audio (voice + noise), as well as the text of the voice -------
         print("[Step 1] Reading the video, getting audio (voice + noise), as well as the text of the voice")
         original_audio_file = self.temp_manager.create_temp_file(suffix='.wav').name
-        if "mp4" in input_file_path:
+        if input_file_path.endswith(('mp4', 'mov', 'avi', 'MP4', 'MOV', 'AVI')):
             orig_clip = VideoFileClip(input_file_path, verbose=True)
             orig_clip.audio.write_audiofile(original_audio_file, codec='pcm_s16le', verbose=True, logger=None)
         else:
             orig_clip = None
-            print("detect static picture input, find aduio file in same file path")
+            print("VIOCE_ONLY enable,just voice cloning!you can set VIOCE_ONLY as 0 in config.json to disable")
+            assert input_file_path.endswith(('mp3', 'wav', 'WAV', 'MP3'))
             original_audio_file = input_file_path
             
         original_audio = AudioSegment.from_file(original_audio_file)
