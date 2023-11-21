@@ -16,6 +16,9 @@
 [【MyHeyGen教程|这样配置应该简单很多吧】](https://www.bilibili.com/video/BV1cN4y1D73X/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
 相当于一键包，不需要配环境，但是得微氪金
 
+## 声明
+此开源代码只能用于研究/学术/个人目的，严格禁止任何形式的商业用途。如有商业要求，请直接联系我们！
+
 ## 环境准备
 1. 在[huggingface申请token](https://huggingface.co/),放在config.json的HF_TOKEN参数下,分别同意[`speaker-diarization`](https://hf.co/pyannote/speaker-diarization)和[`segmentation`](https://hf.co/pyannote/segmentation)的使用协议
 2. 在[百度翻译申请APPKey](https://fanyi-api.baidu.com/doc/21)用于翻译字幕放在config.json的TS_APPID和TS_APPKEY参数下

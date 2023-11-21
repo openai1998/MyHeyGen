@@ -15,6 +15,9 @@ A civilian version video translation tool that provides a full process solution 
 [【MyHeyGen教程|这样配置应该简单很多吧】](https://www.bilibili.com/video/BV1cN4y1D73X/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
 Equivalent to a one click package, no environment required, but with small funds
 
+## Disclaimer
+This open-source code or our demo website should only be used for research/academic/personal purposes only,any form of commercial use is strictly prohibited. For commercial requests please contact us directly!
+
 ## Environmental preparation
 1. Get [huggingface](https://huggingface.co/) Token in config.json `HF_TOKEN`
 2. Apply for [fanyi](https://fanyi-api.baidu.com/?fr=pcHeader)APPID and APPKey in config.json `TS_APPID` and `TS_APPKEY`
