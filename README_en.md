@@ -3,11 +3,13 @@ A civilian version video translation tool that provides a full process solution 
 ## Thanks
 [HeyGenClone](https://github.com/BrasD99/HeyGenClone.git)、[TTS](https://github.com/coqui-ai/tts)、[Video-retalking](https://github.com/OpenTalker/video-retalking)、[CodeFormer](https://github.com/sczhou/CodeFormer)
 ## Gallery
+
+- [【MyHeyGen | 你听过张三老师的英文脱口秀吗？】] (https://www.bilibili.com/video/BV1fM411Z75W/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
+- [【MyHeyGen | 1个月，头发都秃了，终于实现视频翻译自由啦！】](ttps://www.bilibili.com/video/BV1FM411f7fu/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
+- voice_only效果 [【MyHeyGen测试 | 音视频已经无缝对齐了，这是VOICE_ONLY模式】]( https://www.bilibili.com/video/BV1v94y1H7Ja/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
 - finetune效果 [【MyHeyGen测试 | 节选霉霉的NYU毕业演讲片段】]( https://www.bilibili.com/video/BV1vc411X7EA/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
 - [【6种语言向世界报喜，我的女儿面面出生啦 ! | MyHeyGen 用例】]( https://www.bilibili.com/video/BV1eC4y1E7qc/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
-- [【好家伙一下子学了英语、日语、法语、俄语、韩语5国外语，肾好，肾好！ | MyHeyGen效果演示】](https://www.bilibili.com/video/BV1wC4y1E78h/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
-- [【张三老师英文普法！英文区的网友有福啦】](https://www.bilibili.com/video/BV1XN41137Bv/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
-- [【MyHeyGen测试|这英的英语倍儿地道！】](https://www.bilibili.com/video/BV1vN4y1D7mo/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
+
 ## Tutorial
 [【MyHeyGen来了！！！】]( https://www.bilibili.com/video/BV14C4y1J7dY/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
 
