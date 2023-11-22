@@ -3,8 +3,8 @@
 ## 参考项目（感谢他们的优秀作品）
 [HeyGenClone](https://github.com/BrasD99/HeyGenClone.git)、[TTS](https://github.com/coqui-ai/tts)、[Video-retalking](https://github.com/OpenTalker/video-retalking)、[CodeFormer](https://github.com/sczhou/CodeFormer)
 ## 实现效果
-- [【MyHeyGen | 你听过张三老师的英文脱口秀吗？】] (https://www.bilibili.com/video/BV1fM411Z75W/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
-- [【MyHeyGen | 1个月，头发都秃了，终于实现视频翻译自由啦！】](ttps://www.bilibili.com/video/BV1FM411f7fu/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
+- [【MyHeyGen | 你听过张三老师的英文脱口秀吗？】](https://www.bilibili.com/video/BV1fM411Z75W/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
+- [【MyHeyGen | 1个月，头发都秃了，终于实现视频翻译自由啦！】](https://www.bilibili.com/video/BV1FM411f7fu/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
 - voice_only效果 [【MyHeyGen测试 | 音视频已经无缝对齐了，这是VOICE_ONLY模式】]( https://www.bilibili.com/video/BV1v94y1H7Ja/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
 - finetune效果 [【MyHeyGen测试 | 节选霉霉的NYU毕业演讲片段】]( https://www.bilibili.com/video/BV1vc411X7EA/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
 - [【6种语言向世界报喜，我的女儿面面出生啦 ! | MyHeyGen 用例】]( https://www.bilibili.com/video/BV1eC4y1E7qc/?share_source=copy_web&vd_source=453c36b4abef37acd389d4c01b149023)
