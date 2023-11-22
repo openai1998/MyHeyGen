@@ -118,17 +118,10 @@ class Engine:
             
             if start > prev_end:
                 ## add empty video and audio
-                '''
-                if orig_clip is not None:
-                    speech_video.append(orig_clip.subclip(prev_end / 1000, start / 1000))
-                '''
                 speech_audio += AudioSegment.silent(duration=start - prev_end)
                 new_noise_audio += noise_audio[prev_end:start]
             
-            '''
-            if orig_clip is not None:
-                tmp_video = orig_clip.subclip(start/1000, end/1000)
-            '''
+        
             tmp_audio = AudioSegment.from_file(cloned_wav)
             tmp_noise_audio = noise_audio[start:end]
             
@@ -137,11 +130,6 @@ class Engine:
             
             speech_audio += tmp_audio
             
-            '''
-            if orig_clip is not None:
-                tmp_video_ = self.video_map_audio(tmp_audio, tmp_video)
-                speech_video.append(tmp_video_)
-            '''
             
             tmp_noise_audio_path_ = self.temp_manager.create_temp_file(suffix='.wav').name
             audio_noise_ratio = tmp_audio.duration_seconds / tmp_noise_audio.duration_seconds
@@ -150,10 +138,6 @@ class Engine:
             new_noise_audio += AudioSegment.from_file(tmp_noise_audio_path_)
         
             if i + 1 == len(speakers):
-                '''
-                if orig_clip is not None:
-                    speech_video.append(orig_clip.subclip(end/1000))
-                '''
                 speech_audio += voice_audio[end:]
                 new_noise_audio += noise_audio[end:]
             prev_end = end
@@ -171,14 +155,9 @@ class Engine:
         combined_audio = combine_audio(speech_audio_wav, noise_audio_wav)
         
         if orig_clip is not None:
-            '''
-            new_video_clip = concatenate_videoclips(speech_video)
-            new_video_mp4 = self.temp_manager.create_temp_file(suffix='.mp4').name
-            new_video_clip.write_videofile(new_video_mp4,audio=False,fps=60)
-            '''
             new_video_mp4 = os.path.join(Path(output_file_path).parent, "video_extend.mp4")
             new_video_clip = self.video_map_audio(speech_audio, orig_clip)
-            new_video_clip.write_videofile(new_video_mp4,audio=False)
+            new_video_clip.write_videofile(new_video_mp4,audio=False,fps=30)
             # some bug made write twice!!
             new_video_clip.write_videofile(new_video_mp4,audio=False)
             input_file_path = new_video_mp4
@@ -239,10 +218,10 @@ class Engine:
         
         video_duration = video.duration
         
-        ratio = audio_duration / video_duration
-        print("audio_duration / video_duration=ratio:{}".format(ratio))
+        ratio = video_duration / audio_duration 
+        print("video_duration / audio_duration  =ratio:{}".format(ratio))
         
         new_video = video.fl_time(lambda t:  ratio*t,apply_to=['mask', 'audio'])
         new_video1 = new_video.set_duration(audio_duration)
-        new_video2 = new_video1.set_fps(new_video1.fps / audio_duration * video_duration)
+        new_video2 = new_video1.set_fps(new_video1.fps / video_duration * audio_duration)
         return new_video2
