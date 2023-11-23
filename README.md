@@ -46,7 +46,6 @@ bash install.sh
 git clone https://github.com/AIFSH/MyHeyGen.git
 cd MyHeyGen
 bash install.sh
-pip install TTS=0.20.2
 pip install tensorflow=2.13.0
 pip install numpy=1.22.2
 ```
@@ -54,7 +53,7 @@ pip install numpy=1.22.2
       
 3.或者拉取docker镜像
 ```
-docker pull registry.cn-beijing.aliyuncs.com/codewithgpu2/aifsh-myheygen:o3U7yjrWg5
+docker pull registry.cn-beijing.aliyuncs.com/codewithgpu2/aifsh-myheygen:27YrVoDwTG
 ```
 ## 测试
 ```
