@@ -41,7 +41,7 @@ bash install.sh
 ```
 or use docker
 ```
-docker pull registry.cn-beijing.aliyuncs.com/codewithgpu2/aifsh-myheygen:o3U7yjrWg5
+docker pull registry.cn-beijing.aliyuncs.com/codewithgpu2/aifsh-myheygen:27YrVoDwTG
 ```
 ## Try
 ```
