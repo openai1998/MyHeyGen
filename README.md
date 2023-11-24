@@ -20,9 +20,10 @@
 此开源代码只能用于研究/学术/个人目的，严格禁止任何形式的商业用途。如有商业要求，请直接联系我们！
 
 ## 环境准备
-1. 在[huggingface申请token](https://huggingface.co/),放在config.json的HF_TOKEN参数下,分别同意[`speaker-diarization`](https://hf.co/pyannote/speaker-diarization)和[`segmentation`](https://hf.co/pyannote/segmentation)的使用协议
-2. 在[百度翻译申请APPKey](https://fanyi-api.baidu.com/doc/21)用于翻译字幕放在config.json的TS_APPID和TS_APPKEY参数下
-3. 下载`weights` [drive](https://drive.google.com/file/d/1dYy24q_67TmVuv_PbChe2t1zpNYJci1J/view?usp=sharing)放在MyHeyGen目录下，下载`checkpoints` [drive](https://drive.google.com/drive/folders/18rhjMpxK8LVVxf7PI6XwOidt8Vouv_H0?usp=share_link) 放在video-retalking目录下,从weights复制GFPGANv1.4.pth到checkpoints，如下图
+1. GPU >= 24GB, Pyhton >= 3.10.0, torch 2.1.0, cuda:11.8 
+2. 在[huggingface申请token](https://huggingface.co/),放在config.json的HF_TOKEN参数下,分别同意[`speaker-diarization`](https://hf.co/pyannote/speaker-diarization)和[`segmentation`](https://hf.co/pyannote/segmentation)的使用协议
+3. 在[百度翻译申请APPKey](https://fanyi-api.baidu.com/doc/21)用于翻译字幕放在config.json的TS_APPID和TS_APPKEY参数下
+4. 下载`weights` [drive](https://drive.google.com/file/d/1dYy24q_67TmVuv_PbChe2t1zpNYJci1J/view?usp=sharing)放在MyHeyGen目录下，下载`checkpoints` [drive](https://drive.google.com/drive/folders/18rhjMpxK8LVVxf7PI6XwOidt8Vouv_H0?usp=share_link) 放在video-retalking目录下,从weights复制GFPGANv1.4.pth到checkpoints，如下图
 
 <div>
   <figure>
