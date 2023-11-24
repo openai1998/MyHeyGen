@@ -21,9 +21,10 @@ Equivalent to a one click package, no environment required, but with small funds
 This open-source code or our demo website should only be used for research/academic/personal purposes only,any form of commercial use is strictly prohibited. For commercial requests please contact us directly!
 
 ## Environmental preparation
-1. Get [huggingface](https://huggingface.co/) Token in config.json `HF_TOKEN`
-2. Apply for [fanyi](https://fanyi-api.baidu.com/?fr=pcHeader)APPID and APPKey in config.json `TS_APPID` and `TS_APPKEY`
-3. Download [weights](https://drive.google.com/file/d/1dYy24q_67TmVuv_PbChe2t1zpNYJci1J/view?usp=sharing) and unzip it in `MyHeyGen`，download [checkpoints](https://drive.google.com/drive/folders/18rhjMpxK8LVVxf7PI6XwOidt8Vouv_H0?usp=share_link) then put it in MyHeyGen/video-retalking,remenber copy GFPGANv1.4.pth from weights to checkpoints!
+1. GPU >= 24GB, Pyhton >= 3.10.0, torch 2.1.0, cuda:11.8 
+2. Get [huggingface](https://huggingface.co/) Token in config.json `HF_TOKEN`
+3. Apply for [fanyi](https://fanyi-api.baidu.com/?fr=pcHeader)APPID and APPKey in config.json `TS_APPID` and `TS_APPKEY`
+4. Download [weights](https://drive.google.com/file/d/1dYy24q_67TmVuv_PbChe2t1zpNYJci1J/view?usp=sharing) and unzip it in `MyHeyGen`，download [checkpoints](https://drive.google.com/drive/folders/18rhjMpxK8LVVxf7PI6XwOidt8Vouv_H0?usp=share_link) then put it in MyHeyGen/video-retalking,remenber copy GFPGANv1.4.pth from weights to checkpoints!
 
 <div>
   <figure>
