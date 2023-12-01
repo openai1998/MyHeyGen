@@ -74,13 +74,7 @@ python translate.py 原视频文件路径 想要翻译成的语言代码 -o 翻�
 - 2023.11.16 add finetune for voice cloning(test on GPU A5000 24GB)
 - 2023.11.19 Huge update !!! add codeformer,h5 vocal split,rewrite audio aligment,voice-only mode
 
-## 交流群及打赏码
-<div>
-  <figure>
-  <img alt='交流群' src="./img/chat.jpg?raw=true" width="300px"/>
-  <img alt='赏泡面' src="./img/ludan.jpg?raw=true" width="300px"/>
-  <figure>
-</div>
+
 
 ## 关于`config.json`
 ```
